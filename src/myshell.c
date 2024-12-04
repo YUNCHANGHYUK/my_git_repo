@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
+
 
 #define MAX_LINE 80
 #define MAX_ARGS 10
@@ -42,8 +44,21 @@ int main()
         {
             printf("goodbye\n");
             exit(0);
-        }
+        } 
+        
+        //cd command
+        else if (strcmp(argv[0], "cd") == 0)
+        {
+            chdir(argv[1]);
 
+        } 
+        
+        //pwd command
+        else if (strcmp(argv[0], "pwd") == 0)
+        {
+            getcwd(input, MAX_LINE);
+            printf("%s\n", input);
+        }
         
     }
 
