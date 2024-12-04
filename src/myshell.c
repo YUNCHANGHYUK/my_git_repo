@@ -2,7 +2,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 
+#include "ls_command.h"
+#include "cat_command.h"
 
 #define MAX_LINE 80
 #define MAX_ARGS 10
@@ -40,6 +44,7 @@ int main()
             continue;
         }
 
+        //exit command
         if(strcmp(argv[0],"exit") == 0)
         {
             printf("goodbye\n");
@@ -59,7 +64,38 @@ int main()
             getcwd(input, MAX_LINE);
             printf("%s\n", input);
         }
+
+        else if (strcmp(argv[0], "ls") == 0)
+        {
+            my_ls();
+        }
         
+        else if (strcmp(argv[0], "cat") == 0)
+        {
+            my_cat(argv[1]);
+        }
+
+        else {
+            if (access(argv[0], X_OK) == 0) {
+                pid_t pid = fork(); // 자식 프로세스 생성
+                if (pid == 0) { // 자식 프로세스
+                    execv(argv[0], argv); // 명령 실행
+                    perror("execv"); // 실패 시 오류 메시지 출력
+                    exit(EXIT_FAILURE); // 실행 실패 시 종료
+                } else if (pid > 0) { // 부모 프로세스
+                    int status;
+                    waitpid(pid, &status, 0); // 자식 프로세스 종료 대기
+                } else {
+                    perror("fork"); // fork 실패 처리
+                }
+            } 
+            else 
+            {
+                printf("not executable: %s\n", argv[0]);
+            }
+
+        }
+
     }
 
     return 0;
